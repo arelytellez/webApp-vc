@@ -7,6 +7,7 @@ const ordenTexto = document.getElementById("orden");
 
 let ultimoMovimiento = Date.now();
 let suspendido = false;
+
 const historialLista = document.getElementById("historialOrdenes");
 let ultimaOrdenGuardada = "";
 
@@ -75,7 +76,7 @@ function onResults(results) {
 }
 
 // ============================
-// DETECCIÓN SEGÚN TU IMAGEN
+// DETECCIÓN DE GESTOS
 // ============================
 
 function detectarGesto(landmarks) {
@@ -88,46 +89,50 @@ function detectarGesto(landmarks) {
 
   const dedosArriba = [indice, medio, anular, menique].filter(d => d).length;
 
-  // ==========================
-  // PRIORIDAD DE GESTOS
-  // ==========================
-
-  // ✊ DETENER (puño)
+  // ✊ DETENER
   if (dedosArriba === 0 && !pulgarArriba)
     return "Detener";
 
-  // 👍 RETROCEDER (solo pulgar)
+  // 👍 RETROCEDER
   if (dedosArriba === 0 && pulgarArriba)
     return "Retroceder";
 
-  // ✋ AVANZAR (mano completamente abierta)
+  // ✋ AVANZAR
   if (dedosArriba === 4 && pulgarArriba)
     return "Avanzar";
 
-  // 360° DERECHA (3 dedos arriba)
+  // 🤟 360° DERECHA (3 dedos)
   if (indice && medio && anular && !menique)
     return "360° derecha";
 
-  // 90° IZQUIERDA (2 dedos arriba)
+  // ✌️ 90° IZQUIERDA (2 dedos)
   if (indice && medio && !anular && !menique)
     return "90° izquierda";
 
-  // 90° DERECHA (solo índice arriba)
+  // ===================================================
+  // SOLO ÍNDICE → GIROS Y 90° DERECHA
+  // ===================================================
+
   if (indice && !medio && !anular && !menique) {
 
-    // Si el dedo está inclinado hacia derecha → vuelta derecha
-    if (landmarks[8].x > landmarks[6].x + 0.05)
-      return "Vuelta derecha";
+    const deltaX = landmarks[8].x - landmarks[6].x;
+    const deltaY = landmarks[6].y - landmarks[8].y;
 
-    // Si está inclinado hacia izquierda → vuelta izquierda
-    if (landmarks[8].x < landmarks[6].x - 0.05)
-      return "Vuelta izquierda";
+    // 👉👈 Horizontal = GIROS
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
 
-    return "90° derecha";
-  }
+      if (deltaX > 0.06)
+        return "Giro derecha";   // 👉
 
-  // 360° IZQUIERDA (movimiento circular con índice)
-  if (indice && !medio && !anular && !menique) {
+      if (deltaX < -0.06)
+        return "Giro izquierda"; // 👈
+    }
+
+    // ☝️ Vertical = 90° derecha
+    if (deltaY > 0.08)
+      return "90° derecha";
+
+    // 🔄 Movimiento circular = 360° izquierda
     detectarMovimiento(landmarks[8]);
     if (esCircular())
       return "360° izquierda";
@@ -140,19 +145,23 @@ function detectarGesto(landmarks) {
 // DETECCIÓN CIRCULAR
 // ============================
 
-let historial = [];
+let historialMovimiento = [];
 
 function detectarMovimiento(punto) {
-  historial.push({ x: punto.x, y: punto.y });
-  if (historial.length > 20) historial.shift();
+  historialMovimiento.push({ x: punto.x, y: punto.y });
+  if (historialMovimiento.length > 20)
+    historialMovimiento.shift();
 }
 
 function esCircular() {
-  if (historial.length < 15) return false;
+  if (historialMovimiento.length < 15) return false;
 
   let variacionX = 0;
-  for (let i = 1; i < historial.length; i++) {
-    variacionX += Math.abs(historial[i].x - historial[i - 1].x);
+
+  for (let i = 1; i < historialMovimiento.length; i++) {
+    variacionX += Math.abs(
+      historialMovimiento[i].x - historialMovimiento[i - 1].x
+    );
   }
 
   return variacionX > 0.3;
@@ -170,9 +179,12 @@ function verificarSuspension() {
   }
 }
 
+// ============================
+// HISTORIAL
+// ============================
+
 function guardarOrden(orden) {
 
-  // Evita guardar repetidas seguidas
   if (orden === ultimaOrdenGuardada || orden === "Orden no reconocida")
     return;
 
@@ -180,17 +192,17 @@ function guardarOrden(orden) {
 
   const item = document.createElement("li");
   item.className = "list-group-item";
-  
+
   const hora = new Date().toLocaleTimeString();
   item.textContent = `${hora} → ${orden}`;
 
   historialLista.prepend(item);
 
-  // Limitar a 10 órdenes máximo
   if (historialLista.children.length > 10) {
     historialLista.removeChild(historialLista.lastChild);
   }
 }
+
 function limpiarHistorial() {
   historialLista.innerHTML = "";
   ultimaOrdenGuardada = "";
