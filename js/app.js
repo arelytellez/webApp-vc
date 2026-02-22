@@ -7,6 +7,8 @@ const ordenTexto = document.getElementById("orden");
 
 let ultimoMovimiento = Date.now();
 let suspendido = false;
+const historialLista = document.getElementById("historialOrdenes");
+let ultimaOrdenGuardada = "";
 
 // ============================
 // CONFIGURAR MEDIAPIPE
@@ -67,6 +69,7 @@ function onResults(results) {
 
   const gesto = detectarGesto(landmarks);
   ordenTexto.textContent = gesto;
+  guardarOrden(gesto);
 
   canvasCtx.restore();
 }
@@ -165,4 +168,30 @@ function verificarSuspension() {
     suspendido = true;
     estado.textContent = "Estado: Suspendido";
   }
+}
+
+function guardarOrden(orden) {
+
+  // Evita guardar repetidas seguidas
+  if (orden === ultimaOrdenGuardada || orden === "Orden no reconocida")
+    return;
+
+  ultimaOrdenGuardada = orden;
+
+  const item = document.createElement("li");
+  item.className = "list-group-item";
+  
+  const hora = new Date().toLocaleTimeString();
+  item.textContent = `${hora} → ${orden}`;
+
+  historialLista.prepend(item);
+
+  // Limitar a 10 órdenes máximo
+  if (historialLista.children.length > 10) {
+    historialLista.removeChild(historialLista.lastChild);
+  }
+}
+function limpiarHistorial() {
+  historialLista.innerHTML = "";
+  ultimaOrdenGuardada = "";
 }
