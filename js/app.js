@@ -1,3 +1,7 @@
+// ======================================
+// REFERENCIAS HTML
+// ======================================
+
 const videoElement = document.getElementById("video");
 const canvasElement = document.getElementById("canvas");
 const canvasCtx = canvasElement.getContext("2d");
@@ -11,9 +15,9 @@ let suspendido = false;
 const historialLista = document.getElementById("historialOrdenes");
 let ultimaOrdenGuardada = "";
 
-// ============================
+// ======================================
 // CONFIGURAR MEDIAPIPE
-// ============================
+// ======================================
 
 const hands = new Hands({
   locateFile: (file) => {
@@ -42,9 +46,9 @@ const camera = new Camera(videoElement, {
 
 camera.start();
 
-// ============================
-// RESULTADOS
-// ============================
+// ======================================
+// RESULTADOS DE MEDIAPIPE
+// ======================================
 
 function onResults(results) {
 
@@ -75,9 +79,9 @@ function onResults(results) {
   canvasCtx.restore();
 }
 
-// ============================
-// DETECCIÓN DE GESTOS
-// ============================
+// ======================================
+// DETECCIÓN DE GESTOS (VERSIÓN FINAL)
+// ======================================
 
 function detectarGesto(landmarks) {
 
@@ -89,6 +93,10 @@ function detectarGesto(landmarks) {
 
   const dedosArriba = [indice, medio, anular, menique].filter(d => d).length;
 
+  // ==========================
+  // PRIORIDAD DE GESTOS
+  // ==========================
+
   // ✊ DETENER
   if (dedosArriba === 0 && !pulgarArriba)
     return "Detener";
@@ -97,79 +105,46 @@ function detectarGesto(landmarks) {
   if (dedosArriba === 0 && pulgarArriba)
     return "Retroceder";
 
-  // ✋ AVANZAR
+  // ✋ AVANZAR (5 dedos)
   if (dedosArriba === 4 && pulgarArriba)
     return "Avanzar";
 
-  // 🤟 360° DERECHA (3 dedos)
+  // 🤟 360° DERECHA (índice + medio + meñique)
+ 
+  // 360° DERECHA (3 dedos arriba)
   if (indice && medio && anular && !menique)
     return "360° derecha";
 
-  // ✌️ 90° IZQUIERDA (2 dedos)
+
+  // 🖐 360° IZQUIERDA (4 dedos sin pulgar)
+  if (dedosArriba === 4 && !pulgarArriba)
+    return "360° izquierda";
+
+  // ✌️ 90° IZQUIERDA
   if (indice && medio && !anular && !menique)
     return "90° izquierda";
 
-  // ===================================================
-  // SOLO ÍNDICE → GIROS Y 90° DERECHA
-  // ===================================================
-
+  // ☝️ SOLO ÍNDICE ARRIBA
   if (indice && !medio && !anular && !menique) {
 
-    const deltaX = landmarks[8].x - landmarks[6].x;
-    const deltaY = landmarks[6].y - landmarks[8].y;
+    // 👉 VUELTA DERECHA (inclinado derecha)
+    if (landmarks[8].x > landmarks[6].x + 0.05)
+      return "Vuelta derecha";
 
-    // 👉👈 Horizontal = GIROS
-    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+    // 👈 VUELTA IZQUIERDA (inclinado izquierda)
+    if (landmarks[8].x < landmarks[6].x - 0.05)
+      return "Vuelta izquierda";
 
-      if (deltaX > 0.06)
-        return "Giro derecha";   // 👉
-
-      if (deltaX < -0.06)
-        return "Giro izquierda"; // 👈
-    }
-
-    // ☝️ Vertical = 90° derecha
-    if (deltaY > 0.08)
-      return "90° derecha";
-
-    // 🔄 Movimiento circular = 360° izquierda
-    detectarMovimiento(landmarks[8]);
-    if (esCircular())
-      return "360° izquierda";
+    // ☝️ Recto = 90° derecha
+    return "90° derecha";
   }
 
   return "Orden no reconocida";
 }
 
-// ============================
-// DETECCIÓN CIRCULAR
-// ============================
-
-let historialMovimiento = [];
-
-function detectarMovimiento(punto) {
-  historialMovimiento.push({ x: punto.x, y: punto.y });
-  if (historialMovimiento.length > 20)
-    historialMovimiento.shift();
-}
-
-function esCircular() {
-  if (historialMovimiento.length < 15) return false;
-
-  let variacionX = 0;
-
-  for (let i = 1; i < historialMovimiento.length; i++) {
-    variacionX += Math.abs(
-      historialMovimiento[i].x - historialMovimiento[i - 1].x
-    );
-  }
-
-  return variacionX > 0.3;
-}
-
-// ============================
-// SUSPENSIÓN
-// ============================
+// ======================================
+// SISTEMA DE SUSPENSIÓN (5 SEGUNDOS)
+// ======================================
 
 function verificarSuspension() {
   const ahora = Date.now();
@@ -179,9 +154,9 @@ function verificarSuspension() {
   }
 }
 
-// ============================
-// HISTORIAL
-// ============================
+// ======================================
+// HISTORIAL DE ÓRDENES
+// ======================================
 
 function guardarOrden(orden) {
 
@@ -198,10 +173,15 @@ function guardarOrden(orden) {
 
   historialLista.prepend(item);
 
+  // Máximo 10 órdenes visibles
   if (historialLista.children.length > 10) {
     historialLista.removeChild(historialLista.lastChild);
   }
 }
+
+// ======================================
+// LIMPIAR HISTORIAL
+// ======================================
 
 function limpiarHistorial() {
   historialLista.innerHTML = "";
