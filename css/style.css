@@ -1,0 +1,12 @@
+body {
+    background-color: #f4f6f9;
+}
+
+video {
+    width: 600px;
+    max-width: 100%;
+}
+
+#estado {
+    font-weight: bold;
+}
