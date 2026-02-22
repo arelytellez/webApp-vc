@@ -187,3 +187,5 @@ function limpiarHistorial() {
   historialLista.innerHTML = "";
   ultimaOrdenGuardada = "";
 }
+document.body.style.background =
+  "linear-gradient(135deg, #0f2027, #2c5364)";
