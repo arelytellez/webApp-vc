@@ -37,8 +37,6 @@ body::before {
     text-align: center;
 }
 
-/* CAJA CENTRAL */
-
 .contenido-inicio {
     background: linear-gradient(145deg, #6a00ff, #b300ff);
     padding: 60px;
@@ -48,8 +46,7 @@ body::before {
         0 0 20px #ff00cc,
         0 0 40px #b300ff;
     max-width: 900px;
-    margin: auto;   /* 👈 aquí va */
-    
+    margin: auto;
 }
 
 /* TITULO PRINCIPAL */
@@ -60,8 +57,8 @@ body::before {
     text-transform: uppercase;
     letter-spacing: 3px;
     text-align: center;
-    white-space: nowrap;   /* 👈 evita que corte palabras */
-    
+    white-space: nowrap;
+
     text-shadow:
         0 0 5px #ff00cc,
         0 0 15px #ff00cc,
@@ -69,7 +66,6 @@ body::before {
 
     margin-bottom: 40px;
 }
-
 
 /* DESCRIPCIÓN */
 
@@ -112,12 +108,12 @@ body::before {
     font-size: 2.5rem;
     font-weight: 900;
     text-transform: uppercase;
-    text-shadow:
-        0 0 5px #ff00cc,
-        0 0 15px #ff00cc,
-        0 0 25px #ff66ff;
+    letter-spacing: 3px;
+    text-align: center;
 
-    border-bottom: 1px solid rgba(255,255,255,0.2);
+    text-shadow:
+        0 0 10px #ff00cc,
+        0 0 20px #ff00cc;
 }
 
 /* ===================================== */
@@ -136,10 +132,13 @@ canvas {
 /* ESTADO Y ORDEN */
 /* ===================================== */
 
-#estado, #orden {
+#estado,
+#orden {
     font-weight: 800;
     letter-spacing: 2px;
     text-transform: uppercase;
+    font-size: 1.2rem;
+
     text-shadow:
         0 0 10px #ff00cc,
         0 0 20px #ff00cc;
@@ -158,7 +157,7 @@ canvas {
         0 0 30px #b300ff;
 }
 
-/* TITULOS TARJETAS */
+/* TITULOS TARJETAS (Gestos y Funciones / Historial) */
 
 .card-header {
     font-size: 1.3rem;
@@ -166,10 +165,19 @@ canvas {
     letter-spacing: 2px;
     text-transform: uppercase;
     text-align: center;
+    color: white;
 
-    background: linear-gradient(90deg, #ff00cc, #ff66ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    text-shadow:
+        0 0 10px #ff00cc,
+        0 0 20px #ff00cc;
+}
+
+/* TITULO INTERNO TARJETA */
+
+.card h4 {
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
 
     text-shadow:
         0 0 10px #ff00cc,
@@ -197,13 +205,13 @@ canvas {
     border: none;
     font-weight: 800;
     font-size: 1rem;
-    letter-spacing: 1px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
     color: white;
 
     text-shadow:
-        0 0 5px #ff00cc,
-        0 0 15px #ff00cc,
-        0 0 25px #ff66ff;
+        0 0 10px #ff00cc,
+        0 0 20px #ff00cc;
 
     border-bottom: 1px solid rgba(255,255,255,0.2);
 }
