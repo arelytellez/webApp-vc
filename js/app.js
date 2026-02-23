@@ -15,6 +15,17 @@ let suspendido = false;
 const historialLista = document.getElementById("historialOrdenes");
 let ultimaOrdenGuardada = "";
 
+let camaraActiva = false;
+let camera; 
+
+
+const btnCamara = document.getElementById("btnCamara");
+
+
+function iniciarApp() {
+    document.getElementById("inicio").style.display = "none";
+    document.getElementById("app").style.display = "block";
+}
 // ======================================
 // CONFIGURAR MEDIAPIPE
 // ======================================
@@ -34,7 +45,7 @@ hands.setOptions({
 
 hands.onResults(onResults);
 
-const camera = new Camera(videoElement, {
+camera = new Camera(videoElement, {
   onFrame: async () => {
     if (!suspendido) {
       await hands.send({ image: videoElement });
@@ -187,5 +198,48 @@ function limpiarHistorial() {
   historialLista.innerHTML = "";
   ultimaOrdenGuardada = "";
 }
-document.body.style.background =
-  "linear-gradient(135deg, #0f2027, #2c5364)";
+
+  
+  function iniciarApp() {
+    document.getElementById("inicio").style.display = "none";
+    document.getElementById("app").style.display = "block";
+}
+
+
+
+btnCamara.addEventListener("click", async () => {
+
+    if (!camaraActiva) {
+        await iniciarCamara();
+        btnCamara.textContent = "⛔ Detener Cámara";
+        btnCamara.classList.remove("btn-iniciar");
+        btnCamara.classList.add("btn-detener");
+        camaraActiva = true;
+    } else {
+        detenerCamara();
+        btnCamara.textContent = "🎥 Iniciar Cámara";
+        btnCamara.classList.remove("btn-detener");
+        btnCamara.classList.add("btn-iniciar");
+        camaraActiva = false;
+    }
+
+});
+
+async function iniciarCamara() {
+
+    camera = new Camera(videoElement, {
+        onFrame: async () => {
+            await hands.send({ image: videoElement });
+        },
+        width: 640,
+        height: 480
+    });
+
+    camera.start();
+}
+
+function detenerCamara() {
+    if (camera) {
+        camera.stop();
+    }
+}

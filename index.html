@@ -3,87 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <title>WebApp - Reconocimiento de Gestos</title>
-    <link rel="icon" href="favicon.ico">
+    <link rel="icon" type="image/png" href="img/favicon.png">
+
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    
+
+    <!-- Fuente profesional -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;800;900&display=swap" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
+
+
+<!-- PANTALLA PRINCIPAL -->
+<!-- =============================== -->
+<div id="inicio" class="pantalla-inicio">
+
+    <div class="contenido-inicio">
+        <h1 class="titulo-bienvenida">
+            RECONOCIMIENTO <br> DE GESTOS
+        </h1>
+
+        <p class="descripcion">
+            ESTA APLICACIÓN UTILIZA INTELIGENCIA
+            ARTIFICIAL PARA DETECTAR <br>
+            GESTOS DE LA MANO EN TIEMPO REAL MEDIANTE
+            LA CÁMARA. <br>
+            CADA GESTO EJECUTA UNA ORDEN DIFERENTE
+        </p>
+
+        <button class="btn-comenzar" onclick="iniciarApp()">
+            COMENZAR
+        </button>
+    </div>
+
+</div>
+
+<!-- =============================== -->
+<!-- APLICACIÓN (OCULTA AL INICIO) -->
+<!-- =============================== -->
+<div id="app" style="display:none;">
 
 <!-- NAVBAR -->
 <nav class="navbar navbar-dark bg-dark">
 <div class="container text-center py-4">
-    <h1 class="titulo-principal">🤖 Reconocimiento de Gestos con IA</h1>
+    <h1 class="titulo-principal">Reconocimiento de Gestos con IA</h1>
 </div>
-  </div>
 </nav>
 
 <div class="container mt-4">
   <div class="row">
 
-    <!-- COLUMNA IZQUIERDA (CÁMARA + CANVAS) -->
+    <!-- COLUMNA IZQUIERDA -->
     <div class="col-md-7 text-center">
+        <div class="mb-3">
+    <button id="btnCamara" class="btn btn-iniciar">
+        🎥 Iniciar Cámara 🎥
+    </button>
+</div>
 
-        <!-- Video oculto (MediaPipe lo necesita) -->
         <video id="video" autoplay playsinline style="display:none;"></video>
-
-        <!-- Canvas visible -->
         <canvas id="canvas" width="640" height="480" class="border rounded shadow"></canvas>
 
         <h3 id="estado" class="mt-3">Estado: Activo</h3>
         <h4 id="orden" class="text-primary">Esperando gesto...</h4>
     </div>
 
-    <!-- COLUMNA DERECHA (GESTOS OPTIMIZADOS PARA FLAVÍN) -->
+    <!-- COLUMNA DERECHA -->
     <div class="col-md-5">
         <div class="card shadow">
             <div class="card-header bg-primary text-white">
                 Gestos y Funciones 🚗
             </div>
             <div class="panel-gestos">
-<div class="card card-custom p-4">
-    <h4 class="mb-3">🚗 Gestos del Carrito</h4>
-    <ul class="list-unstyled">
-        <li>✋ Mano abierta → Avanzar</li>
-        <li>✊ Puño → Detener</li>
-        <li>👍 Pulgar → Retroceder</li>
-        <li>👈Índice → Vuelta derecha</li>
-        <li>👉Índice → Vuelta izquierda</li>
-        <li>✌️ Índice + medio → 90° izquierda</li>
-        <li>☝️ Índice → 90° derecha</li>
-        <li>🤟 Tres dedos → 360° derecha</li>
-        <li>🖐 4 dedos → 360° izquierda</li>
-    </ul>
-</div>
-    
-</div>
-<!-- HISTORIAL DE ÓRDENES -->
-<div class="card shadow mt-4">
-  <div class="card-header bg-success text-white">
-    Historial de Órdenes Recibidas 📜
-  </div>
-  <div class="card-body">
-    <ul id="historialOrdenes" class="list-group list-group-flush" style="max-height: 200px; overflow-y: auto;">
-    </ul>
-    <button onclick="limpiarHistorial()" class="btn btn-sm btn-danger mt-3">
-      Limpiar historial
-    </button>
-  </div>
-</div>
-
+                <div class="card card-custom p-4">
+                    <h4 class="mb-3">🚗 Gestos del Carrito</h4>
+                    <ul class="list-unstyled">
+                        <li>✋ Mano abierta → Avanzar</li>
+                        <li>✊ Puño → Detener</li>
+                        <li>👍 Pulgar → Retroceder</li>
+                        <li>👈 Índice → Vuelta derecha</li>
+                        <li>👉 Índice → Vuelta izquierda</li>
+                        <li>✌️ Índice + medio → 90° izquierda</li>
+                        <li>☝️ Índice → 90° derecha</li>
+                        <li>🤟 Tres dedos → 360° derecha</li>
+                        <li>🖐 4 dedos → 360° izquierda</li>
+                    </ul>
+                </div>
             </div>
         </div>
-    </div>
 
+        <!-- HISTORIAL -->
+        <div class="card shadow mt-4">
+          <div class="card-header bg-success text-white">
+            Historial de Órdenes Recibidas 📜
+          </div>
+          <div class="card-body">
+            <ul id="historialOrdenes" class="list-group list-group-flush" style="max-height: 200px; overflow-y: auto;"></ul>
+            <button onclick="limpiarHistorial()" class="btn btn-sm btn-danger mt-3">
+              Limpiar historial
+            </button>
+          </div>
+        </div>
+
+    </div>
   </div>
 </div>
 
-<!-- FOOTER -->
 <footer class="bg-dark text-white text-center p-3 mt-4">
-    Programado por: Arely | 2026
+    Programado por: Arely 
 </footer>
 
-<!-- LIBRERÍAS DE MEDIAPIPE -->
+</div>
+
+<!-- LIBRERÍAS -->
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
